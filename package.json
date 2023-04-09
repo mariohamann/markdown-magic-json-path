@@ -1,0 +1,19 @@
+{
+  "name": "markdown-magic-json-path",
+  "version": "1.0.0",
+  "description": "A Markdown Magic plugin to extract and insert specific values from JSON files into your Markdown documents.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mariohamann/markdown-magic-json-path.git"
+  },
+  "author": "Mario Hamann, ChatGPT",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mariohamann/markdown-magic-json-path/issues"
+  },
+  "homepage": "https://github.com/mariohamann/markdown-magic-json-path#readme"
+}

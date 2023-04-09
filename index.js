@@ -1,3 +1,4 @@
+// markdown-magic-json-path.js
 const fs = require('fs');
 const path = require('path');
 
@@ -25,45 +26,39 @@ function getValueByPath(obj, path) {
   return currentValue;
 }
 
-module.exports = function jsonPlugin(pluginOptions) {
-  // Set plugin defaults
-  const defaultOptions = {
-    encoding: 'utf8'
-  };
+module.exports = (content, options, config) => {
+  const { src, path: jsonPath } = options;
 
-  const userOptions = pluginOptions || {};
-  const pluginConfig = Object.assign(defaultOptions, userOptions);
+  if (!src) {
+    throw new Error('Missing "src" attribute');
+  }
 
-  // Return the transform function
-  return function jsonTransform({ content, options }) {
-    const { src, path: jsonPath } = options;
+  if (!jsonPath) {
+    throw new Error('Missing "path" attribute');
+  }
 
-    if (!src) {
-      throw new Error('Missing "src" attribute');
-    }
+  let jsonFilePath = src;
+  if (path.isAbsolute(src)) {
+    jsonFilePath = src;
+  } else {
+    const fileDir = path.dirname(config.originalPath);
+    jsonFilePath = path.resolve(fileDir, src);
+  }
 
-    if (!jsonPath) {
-      throw new Error('Missing "path" attribute');
-    }
+  let jsonData;
+  try {
+    const fileContent = fs.readFileSync(jsonFilePath, 'utf8');
+    jsonData = JSON.parse(fileContent);
+  } catch (e) {
+    console.log(`FILE NOT FOUND OR INVALID JSON: ${jsonFilePath}`);
+    throw e;
+  }
 
-    const fileDir = path.dirname(src);
-    const jsonFilePath = path.resolve(fileDir, src);
+  const value = getValueByPath(jsonData, jsonPath);
 
-    let jsonData;
-    try {
-      const fileContent = fs.readFileSync(jsonFilePath, pluginConfig.encoding);
-      jsonData = JSON.parse(fileContent);
-    } catch (e) {
-      console.log(`FILE NOT FOUND OR INVALID JSON: ${jsonFilePath}`);
-      throw e;
-    }
+  if (value === undefined) {
+    throw new Error(`Invalid path: ${jsonPath}`);
+  }
 
-    const value = getValueByPath(jsonData, jsonPath);
-
-    if (value === undefined) {
-      throw new Error(`Invalid path: ${jsonPath}`);
-    }
-
-    return value;
-  };
+  return value;
 };
